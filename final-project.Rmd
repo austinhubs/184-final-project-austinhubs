@@ -5,3 +5,28 @@ date: "Due December 17, 2019"
 output:  html_notebook
 ---
 
+```{r}
+# clean up workspace environment
+rm(list = ls())
+
+# all packages used for the assignment
+library(ggplot2)
+library(mosaic)
+library(mosaicData)
+library(DataComputing)
+library(tidyverse)
+library(tidyr)
+library(lubridate)
+library(readr)
+```
+
+
+Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: https://www.kaggle.com/gpandi007/usa-housing-dataset
+
+```{r include=FALSE}
+Housingdata <- read_csv("housing_train.csv")
+```
+```{r}
+str(Housingdata)
+head(Housingdata)
+```
