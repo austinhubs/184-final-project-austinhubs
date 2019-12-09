@@ -23,15 +23,15 @@ library(readr)
 
 ## Research Question:
 
-How did the house prices of houses in America change during the '07 market crash? Are there specific attributes about houses that contributed to them being able to hold their value better through this time period? 
+How long did the recovery of the housing market take in the US after the 2007 market crash? How have prices changed since then? Could there be another bubble burst coming soon?
 
 
 ## Data Access
 
-Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: https://www.kaggle.com/gpandi007/usa-housing-dataset
+Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: 
 ```{r include=FALSE}
-#Housingdata <- read_csv("housing_train.csv")
 Saleprices <- read_csv("Sale_Prices_Msa.csv")
+Justdata <- read_csv("Sale_Prices_Msa.csv",skip=1)
 ```
 ```{r}
 
@@ -45,29 +45,31 @@ head(Saleprices)
 This shows the average house price across the US 
 
 ```{r}
-
 Avgdata <- Saleprices %>% filter(RegionID==102001)
 newAvgdata <- Avgdata %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
 
 newAvgdata %>%
   mutate(Year = lubridate::dym(month)) %>%
   ggplot(aes(x=Year,y=price))+geom_line() 
+
+Justdata
+
+
 ```
 
-
+Adds a new max, min, and mean column for the price of all the homes at that location.
 
 ```{r}
-Justdata <- Saleprices
-Justdata$SizeRank <- NULL
-Justdata$RegionID <- NULL
-Justdata$RegionName <- NULL
-Maxarr <- apply(Justdata,1,max,na.rm=TRUE)
-Minarr <- apply(Justdata,1,min,na.rm=TRUE)
-Minarr
-Saleprices %>%
-  mutate(Maximum = Maxarr) %>%
-  mutate(Minimum = Minarr)
-
+Justmonths <- Saleprices[-c(1,2,3)]
+Meanarr <- apply(Justmonths,1,mean,na.rm=TRUE)
+Maxarr <- apply(Justmonths,1,max,na.rm=TRUE)
+Minarr <- apply(Justmonths,1,min,na.rm=TRUE)
+Saleprices <- 
+  Saleprices %>%
+  mutate(MeanPrice = Meanarr) %>%
+  mutate(MaximumPrice = Maxarr) %>%
+  mutate(MinimumPrice = Minarr)
+Saleprices
 ```
 
 
