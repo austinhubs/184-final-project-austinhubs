@@ -30,7 +30,7 @@ How did the house prices of houses in America change during the '07 market crash
 
 Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: https://www.kaggle.com/gpandi007/usa-housing-dataset
 ```{r include=FALSE}
-Housingdata <- read_csv("housing_train.csv")
+#Housingdata <- read_csv("housing_train.csv")
 Saleprices <- read_csv("Sale_Prices_Msa.csv")
 ```
 ```{r}
@@ -54,19 +54,6 @@ newAvgdata %>%
   ggplot(aes(x=Year,y=price))+geom_line() 
 ```
 
-
-
-
-
-```{r}
-Saleprices %>%
-  group_by()
-count <- 4
-while (count<=143){
-  Total <- summarise(x = mean(Saleprices[count]))
-  count <- count+1
-}
-```
 
 
 
