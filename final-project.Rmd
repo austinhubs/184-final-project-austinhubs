@@ -59,13 +59,7 @@ newAvgdata %>%
 
 
 ```{r}
-Saleprices %>%
-  group_by()
-count <- 4
-while (count<=143){
-  Total <- summarise(x = mean(Saleprices[count]))
-  count <- count+1
-}
+
 ```
 
 
