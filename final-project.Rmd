@@ -28,16 +28,16 @@ How long did the recovery of the housing market take in the US after the 2007 ma
 
 ## Data Access
 
-Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: 
+Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: https://www.zillow.com/research/data/
 ```{r include=FALSE}
 Saleprices <- read_csv("Sale_Prices_Msa.csv")
 Justdata <- read_csv("Sale_Prices_Msa.csv",skip=1)
 ```
 ```{r}
 
-nrow(Saleprices)
-ncol(Saleprices)
-names(Saleprices)
+cat("Number of rows: ",nrow(Saleprices),"\n")
+cat("Number of columns: ",ncol(Saleprices),"\n")
+cat("The following are the names of the columns:",names(Saleprices))
 head(Saleprices)
 
 ```
@@ -45,30 +45,33 @@ head(Saleprices)
 This shows the average house price across the US 
 
 ```{r}
-Avgdata <- Saleprices %>% filter(RegionID==102001)
-newAvgdata <- Avgdata %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
 
+newAvgdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
+newAvgdata
 newAvgdata %>%
   mutate(Year = lubridate::dym(month)) %>%
   ggplot(aes(x=Year,y=price))+geom_line() 
 
-Justdata
-
+Justdata <- Justdata[-c(1,2,3)]
+MeanMonth <- apply(Justdata,2,mean,na.rm=TRUE)
+MaxMonth <- apply(Justdata,2,max,na.rm=TRUE)
+MinMonth <- apply(Justdata,2,min,na.rm=TRUE)
+MaxMonth
 
 ```
 
-Adds a new max, min, and mean column for the price of all the homes at that location.
+Adds a new max, min, and mean column for the price of all the homes at that location. This is all stored in the original dataset as additional columns
 
 ```{r}
 Justmonths <- Saleprices[-c(1,2,3)]
-Meanarr <- apply(Justmonths,1,mean,na.rm=TRUE)
-Maxarr <- apply(Justmonths,1,max,na.rm=TRUE)
-Minarr <- apply(Justmonths,1,min,na.rm=TRUE)
+MeanLoc <- apply(Justmonths,1,mean,na.rm=TRUE)
+MaxLoc <- apply(Justmonths,1,max,na.rm=TRUE)
+MinLoc <- apply(Justmonths,1,min,na.rm=TRUE)
 Saleprices <- 
   Saleprices %>%
-  mutate(MeanPrice = Meanarr) %>%
-  mutate(MaximumPrice = Maxarr) %>%
-  mutate(MinimumPrice = Minarr)
+  mutate(MeanPrice = MeanLoc) %>%
+  mutate(MaximumPrice = MaxLoc) %>%
+  mutate(MinimumPrice = MinLoc)
 Saleprices
 ```
 
