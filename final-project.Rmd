@@ -56,14 +56,20 @@ newAvgdata %>%
 
 
 
-
-<<<<<<< HEAD
-=======
-
 ```{r}
+Justdata <- Saleprices
+Justdata$SizeRank <- NULL
+Justdata$RegionID <- NULL
+Justdata$RegionName <- NULL
+Maxarr <- apply(Justdata,1,max,na.rm=TRUE)
+Minarr <- apply(Justdata,1,min,na.rm=TRUE)
+Minarr
+Saleprices %>%
+  mutate(Maximum = Maxarr) %>%
+  mutate(Minimum = Minarr)
 
 ```
 
 
 
->>>>>>> dc371fff4cdeb6f80b3257fd3247f9f301537f5e
+
