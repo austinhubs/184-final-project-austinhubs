@@ -31,23 +31,22 @@ How long did the recovery of the housing market take in the US after the 2007 ma
 Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: https://www.zillow.com/research/data/
 ```{r include=FALSE}
 Saleprices <- read_csv("Sale_Prices_Msa.csv")
-DaysUp <- read_csv("DaysOnZillow_Msa.csv")
+#NoHeader <- read_csv("Sale_Prices_Msa.csv",skip=1)
 ```
 ```{r}
 cat("Number of rows: ",nrow(Saleprices),"\n")
 cat("Number of columns: ",ncol(Saleprices),"\n")
 head(Saleprices)
-cat("Number of rows: ",nrow(DaysUp),"\n")
-cat("Number of columns: ",ncol(DaysUp),"\n")
-head(DaysUp)
 ```
 
 ```{r}
 JustMonths <- Saleprices[-c(1,2,3)]
-Mean <- apply(JustMonths,2,mean,na.rm=TRUE)
-Max <- apply(JustMonths,2,max,na.rm=TRUE)
-Min <- apply(JustMonths,2,min,na.rm=TRUE)
-MonthlyCalcs <- data.frame("month"=colnames(Justmonths),Min,Max,Mean)
+MeanMonth <- apply(JustMonths,2,mean,na.rm=TRUE)
+MaxMonth <- apply(JustMonths,2,max,na.rm=TRUE)
+MinMonth <- apply(JustMonths,2,min,na.rm=TRUE)
+TempArr <- data.frame("Month"=colnames(Justmonths),MinMonth,MaxMonth,MeanMonth)
+MonthlyCalcs <- data.frame(t(TempArr[-1]))
+colnames(MonthlyCalcs) <- TempArr[,1]
 TotalInfo <- 
   Saleprices %>%
   mutate(MinimumPrice = apply(Justmonths,1,min,na.rm=TRUE)) %>%
@@ -61,23 +60,12 @@ MonthlyCalcs
 This shows the average house price across the US 
 
 ```{r}
-USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank) %>% mutate(Month = lubridate::dym(month))
-MonthlyCalcs %>%
-  mutate(Month = lubridate::dym(month)) %>%
-  ggplot(aes(x=Month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),data=USdata,size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
-
+USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
+USdata %>%
+  mutate(Year = lubridate::dym(month)) %>%
+  ggplot(aes(x=Year,y=price))+geom_line() 
+Totalin
 ```
-
-
-```{r}
-
-
-
-```
-
-
-
-
 
 
 
