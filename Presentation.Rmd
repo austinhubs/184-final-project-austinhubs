@@ -31,12 +31,12 @@ head(Saleprices)
 How long did the recovery of the housing market take in the US after the 2007-08 market crash? How have prices changed since then? Does location have any impact on the recovery of housing prices?
 
 
-## Challenge Encountered:
+## Challenge:
 
 The biggest challenge that I had in the project was figuring out how I wanted to display all of my data. I found that I had plenty of data points and would not have a problem creating graphs, but that was actually my biggest issue. There were so many different possible graphs to create that told so many different stories, it was hard to narrow them down. I found that the graphic below was able to best exemplify the change in house pricing throughout the US overtime. 
 
 
-## Key Visualization:
+## Visualization:
 
 ```{r}
 JustMonths <- Saleprices[-c(1,2,3)]
@@ -50,7 +50,7 @@ MonthlyCalcs %>%
   ggplot(aes(x=Month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),data=USdata,size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
 ```
 
-## Key Insight/Takeaway:
+## Insight/Takeaway:
 
 The graph above shows 2 different lines, one line shows the average house prices of all houses in the entire US, the other shows the average house price of the top 626 cities in the US. What this graphic helps to show is how hard the market crash impacted Americans. Both rates decrease at the same rate, but the average for the US increases much more quickly than the average for the cities does. After millions losing their jobs and many more their savings in the market, they could no longer afford to live in cities and spend a ton of money on housing. These people were driven to find housing in more rural areas which is shown by the gap between the red and blue. During this time the distrust for the American government grew. People were afraid to put money down on expensive houses near the cities, so they took the safer bet and moved more rural.
 
