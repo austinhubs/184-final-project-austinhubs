@@ -11,10 +11,7 @@ rm(list = ls())
 
 # all packages used for the assignment
 library(ggplot2)
-library(mosaic)
-library(mosaicData)
 library(DataComputing)
-library(tidyverse)
 library(tidyr)
 library(lubridate)
 library(readr)
