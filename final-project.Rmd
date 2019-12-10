@@ -1,5 +1,5 @@
 ---
-title: "Housing Data During the '07 Market Crash"
+title: "Housing Data Afer the 2007 Market Crash"
 author: "Austin Huber"
 date: "Due December 17, 2019"
 output:  html_notebook
@@ -31,7 +31,8 @@ How long did the recovery of the housing market take in the US after the 2007 ma
 Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: https://www.zillow.com/research/data/
 ```{r include=FALSE}
 Saleprices <- read_csv("Sale_Prices_Msa.csv")
-DaysUp <- read_csv("DaysOnZillow_Msa.csv")
+DaysUp <- read_csv("DaysOnZillow_State.csv")
+SalePricesState <- read_csv("Sale_Prices_State.csv")
 ```
 ```{r}
 cat("Number of rows: ",nrow(Saleprices),"\n")
@@ -40,6 +41,9 @@ head(Saleprices)
 cat("Number of rows: ",nrow(DaysUp),"\n")
 cat("Number of columns: ",ncol(DaysUp),"\n")
 head(DaysUp)
+cat("Number of rows: ",nrow(SalePricesState),"\n")
+cat("Number of columns: ",ncol(SalePricesState),"\n")
+head(SalePricesState)
 ```
 
 ```{r}
@@ -47,12 +51,12 @@ JustMonths <- Saleprices[-c(1,2,3)]
 Mean <- apply(JustMonths,2,mean,na.rm=TRUE)
 Max <- apply(JustMonths,2,max,na.rm=TRUE)
 Min <- apply(JustMonths,2,min,na.rm=TRUE)
-MonthlyCalcs <- data.frame("month"=colnames(Justmonths),Min,Max,Mean)
+MonthlyCalcs <- data.frame("month"=colnames(JustMonths),Min,Max,Mean)
 TotalInfo <- 
   Saleprices %>%
-  mutate(MinimumPrice = apply(Justmonths,1,min,na.rm=TRUE)) %>%
-  mutate(MaximumPrice = apply(Justmonths,1,max,na.rm=TRUE)) %>%
-  mutate(MeanPrice = apply(Justmonths,1,mean,na.rm=TRUE))
+  mutate(MinimumPrice = apply(JustMonths,1,min,na.rm=TRUE)) %>%
+  mutate(MaximumPrice = apply(JustMonths,1,max,na.rm=TRUE)) %>%
+  mutate(MeanPrice = apply(JustMonths,1,mean,na.rm=TRUE))
 TotalInfo
 MonthlyCalcs
 ```
@@ -65,12 +69,22 @@ USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -Regi
 MonthlyCalcs %>%
   mutate(Month = lubridate::dym(month)) %>%
   ggplot(aes(x=Month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),data=USdata,size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
-
 ```
 
 
 ```{r}
-
+DaysUp
+JustMonths2 <- SalePricesState[-c(1,2,3)]
+MinMaxMeanPerState <- 
+  SalePricesState %>%
+  mutate(MinimumPrice = apply(JustMonths2,1,min,na.rm=TRUE)) %>%
+  mutate(MaximumPrice = apply(JustMonths2,1,max,na.rm=TRUE)) %>%
+  mutate(MeanPrice = apply(JustMonths2,1,mean,na.rm=TRUE)) %>%
+  mutate(Difference = MaximumPrice-MinimumPrice)
+USMap(data=MinMaxMeanPerState, key="RegionName", fill=MinimumPrice)
+USMap(data=MinMaxMeanPerState, key="RegionName", fill=MaximumPrice)
+USMap(data=MinMaxMeanPerState, key="RegionName", fill=MeanPrice)
+USMap(data=MinMaxMeanPerState, key="RegionName", fill=Difference)
 
 
 ```
