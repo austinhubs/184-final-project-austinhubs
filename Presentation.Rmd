@@ -16,7 +16,7 @@ library(tidyr)
 library(lubridate)
 library(readr)
 ```
-
+#### House pricing dataset with 626 US Cities (2008-2019, monthly)
 ```{r include=FALSE}
 Saleprices <- read_csv("Sale_Prices_Msa.csv")
 ```
