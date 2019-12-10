@@ -102,7 +102,7 @@ USMap(data=MinMaxMeanPerState, key="RegionName", fill=Difference)
 ```
 
 ```{r}
-ggplot( data = MinMaxMeanPerState, aes(x = MeanPrice,fill="50 States")) + geom_density(adjust = 0.38,alpha=.5)+labs(title = "")+geom_density(aes(x = MeanPrice,fill="624 Cities"),TotalInfo,adjust = 0.38,alpha=.5)+guides(fill=guide_legend(title="Data"))
+ggplot( data = MinMaxMeanPerState, aes(x = MeanPrice,fill="All US States")) + geom_density(adjust = 0.38,alpha=.5)+labs(title = "")+geom_density(aes(x = MeanPrice,fill="Top 626 Cities"),TotalInfo,adjust = 0.38,alpha=.5)+guides(fill=guide_legend(title="Data"))
 ```
 
 
