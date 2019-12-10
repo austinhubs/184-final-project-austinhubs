@@ -40,15 +40,22 @@ The biggest challenge that I had in the project was figuring out how I wanted to
 ## Visualization:
 
 ```{r}
+# Creates a table of just the months and their data without any columns before
 JustMonths <- Saleprices[-c(1,2,3)]
 Mean <- apply(JustMonths,2,mean,na.rm=TRUE)
 Max <- apply(JustMonths,2,max,na.rm=TRUE)
 Min <- apply(JustMonths,2,min,na.rm=TRUE)
 MonthlyCalcs <- data.frame("month"=colnames(JustMonths),Min,Max,Mean)
-USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank) %>% mutate(Month = lubridate::dym(month))
-MonthlyCalcs %>%
-  mutate(Month = lubridate::dym(month)) %>%
-  ggplot(aes(x=Month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),data=USdata,size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
+
+#Joins the monthlydata with the average data of the whole US
+USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
+USExtensiveData <- USdata %>% left_join(MonthlyCalcs, by=c("month"="month"))
+
+# Creates the visualization seen below using USExtensiveData
+USExtensiveData %>%
+  mutate(month = lubridate::dym(month)) %>%
+  filter(month!="2019-10-20") %>%
+  ggplot(aes(x=month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
 ```
 
 ## Insight/Takeaway:
