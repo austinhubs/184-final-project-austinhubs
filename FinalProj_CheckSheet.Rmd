@@ -60,7 +60,7 @@ output:  html_notebook
 
 (A) .Rmd Line number(s) for use of mulitple different geoms:  
 
-(B) .Rmd Line number(s) for use of multiple aesthetics:  
+(B) .Rmd Line number(s) for use of multiple aesthetics:  83
 
 (C) .Rmd Line number(s) for use of layered graphics:  
 

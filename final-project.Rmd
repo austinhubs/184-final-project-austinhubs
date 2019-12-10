@@ -15,6 +15,8 @@ All packages used for the assignment can be found below:
 library(ggplot2)
 library(DataComputing)
 library(tidyr)
+library(tidyverse)
+library(dplyr)
 library(lubridate)
 library(readr)
 ```
@@ -22,7 +24,7 @@ library(readr)
 
 ## Research Question
 
-**How long did the recovery of the housing market take in the US after the 2007 market crash? How have prices changed since then? Could there be another bubble burst coming soon?**
+**How long did the recovery of the housing market take in the US after the 2007-08 market crash? How have prices changed since then? Does location have any impact on the recovery of housing prices?**
 
 
 ## Data Access
@@ -55,36 +57,26 @@ cat("Number of rows: ",nrow(DaysUp),"\nNumber of columns: ",ncol(DaysUp),"\n")
 head(DaysUp)
 ```
 
+## Wrangling
 ```{r}
 JustMonths <- Saleprices[-c(1,2,3)]
 Mean <- apply(JustMonths,2,mean,na.rm=TRUE)
 Max <- apply(JustMonths,2,max,na.rm=TRUE)
 Min <- apply(JustMonths,2,min,na.rm=TRUE)
 MonthlyCalcs <- data.frame("month"=colnames(JustMonths),Min,Max,Mean)
+MonthlyCalcs
+
 TotalInfo <- 
   Saleprices %>%
   mutate(MinimumPrice = apply(JustMonths,1,min,na.rm=TRUE)) %>%
   mutate(MaximumPrice = apply(JustMonths,1,max,na.rm=TRUE)) %>%
   mutate(MeanPrice = apply(JustMonths,1,mean,na.rm=TRUE))
 TotalInfo
-MonthlyCalcs
-```
 
-
-This shows the average house price across the US 
-
-```{r}
 USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
 USExtensiveData <- USdata %>% left_join(MonthlyCalcs, by=c("month"="month"))
-USExtensiveData %>%
-  mutate(month = lubridate::dym(month)) %>%
-  filter(month!="2019-10-20") %>%
-  ggplot(aes(x=month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
-```
+USExtensiveData
 
-
-```{r}
-DaysUp
 JustMonths2 <- SalePricesState[-c(1,2,3)]
 MinMaxMeanPerState <- 
   SalePricesState %>%
@@ -92,14 +84,26 @@ MinMaxMeanPerState <-
   mutate(MaximumPrice = apply(JustMonths2,1,max,na.rm=TRUE)) %>%
   mutate(MeanPrice = apply(JustMonths2,1,mean,na.rm=TRUE)) %>%
   mutate(Difference = MaximumPrice-MinimumPrice)
-USMap(data=MinMaxMeanPerState, key="RegionName", fill=MinimumPrice)
-USMap(data=MinMaxMeanPerState, key="RegionName", fill=MaximumPrice)
-USMap(data=MinMaxMeanPerState, key="RegionName", fill=MeanPrice)
-USMap(data=MinMaxMeanPerState, key="RegionName", fill=Difference)
-
-
+MinMaxMeanPerState
 ```
 
+## Visualizations
+
+```{r}
+USExtensiveData %>%
+  mutate(month = lubridate::dym(month)) %>%
+  filter(month!="2019-10-20") %>%
+  ggplot(aes(x=month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
+```
+
+This graphic shows that there were more people moving out West after the housing crisis. As more people wanted to move out West, the demand for housing increased which is what caused such a big difference in price.
+```{r}
+USMap(data=MinMaxMeanPerState, key="RegionName", fill=Difference)
+```
+
+```{r}
+ggplot( data = MinMaxMeanPerState, aes(x = MeanPrice,fill="50 States")) + geom_density(adjust = 0.38,alpha=.5)+labs(title = "")+geom_density(aes(x = MeanPrice,fill="624 Cities"),TotalInfo,adjust = 0.38,alpha=.5)+guides(fill=guide_legend(title="Data"))
+```
 
 
 
