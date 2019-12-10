@@ -20,9 +20,10 @@ library(readr)
 ```{r include=FALSE}
 Saleprices <- read_csv("Sale_Prices_Msa.csv")
 ```
+```{r echo=FALSE}
+cat("Number of rows: ",nrow(Saleprices),"\nNumber of columns: ",ncol(Saleprices),"\n")
+```
 ```{r}
-cat("Number of rows: ",nrow(Saleprices),"\n")
-cat("Number of columns: ",ncol(Saleprices),"\n")
 head(Saleprices)
 ```
 
