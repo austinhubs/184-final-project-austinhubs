@@ -5,11 +5,13 @@ date: "Due December 17, 2019"
 output:  html_notebook
 ---
 
-```{r}
+```{r include=FALSE}
 # clean up workspace environment
 rm(list = ls())
+```
 
-# all packages used for the assignment
+All packages used for the assignment can be found below:
+```{r}
 library(ggplot2)
 library(DataComputing)
 library(tidyr)
@@ -18,9 +20,9 @@ library(readr)
 ```
 
 
-## Research Question:
+## Research Question
 
-How long did the recovery of the housing market take in the US after the 2007 market crash? How have prices changed since then? Could there be another bubble burst coming soon?
+**How long did the recovery of the housing market take in the US after the 2007 market crash? How have prices changed since then? Could there be another bubble burst coming soon?**
 
 
 ## Data Access
@@ -31,16 +33,26 @@ Saleprices <- read_csv("Sale_Prices_Msa.csv")
 DaysUp <- read_csv("DaysOnZillow_State.csv")
 SalePricesState <- read_csv("Sale_Prices_State.csv")
 ```
+### House pricing dataset with 626 US Cities (2008-2019, monthly)
+```{r echo=FALSE}
+cat("Number of rows: ",nrow(Saleprices),"\nNumber of columns: ",ncol(Saleprices),"\n")
+```
 ```{r}
-cat("Number of rows: ",nrow(Saleprices),"\n")
-cat("Number of columns: ",ncol(Saleprices),"\n")
 head(Saleprices)
-cat("Number of rows: ",nrow(DaysUp),"\n")
-cat("Number of columns: ",ncol(DaysUp),"\n")
-head(DaysUp)
-cat("Number of rows: ",nrow(SalePricesState),"\n")
-cat("Number of columns: ",ncol(SalePricesState),"\n")
+```
+### House pricing dataset with 50 US States (2008-2019, monthly)
+```{r echo=FALSE}
+cat("Number of rows: ",nrow(SalePricesState),"\nNumber of columns: ",ncol(SalePricesState),"\n")
+```
+```{r}
 head(SalePricesState)
+```
+### Number of days a listing spent on Zillow per US State dataset (2010-2019, monthly)
+```{r echo=FALSE}
+cat("Number of rows: ",nrow(DaysUp),"\nNumber of columns: ",ncol(DaysUp),"\n")
+```
+```{r}
+head(DaysUp)
 ```
 
 ```{r}
@@ -62,10 +74,12 @@ MonthlyCalcs
 This shows the average house price across the US 
 
 ```{r}
-USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank) %>% mutate(Month = lubridate::dym(month))
-MonthlyCalcs %>%
-  mutate(Month = lubridate::dym(month)) %>%
-  ggplot(aes(x=Month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),data=USdata,size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
+USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
+USExtensiveData <- USdata %>% left_join(MonthlyCalcs, by=c("month"="month"))
+USExtensiveData %>%
+  mutate(month = lubridate::dym(month)) %>%
+  filter(month!="2019-10-20") %>%
+  ggplot(aes(x=month,y=Mean,color="Average in top 626 Cities"))+geom_line(size=1)+geom_line(mapping=aes(y=price,color="Average in all of the US"),size=1)+ggtitle("Average Price of Houses in the US")+xlab("Years")+ylab("Price (in dollars)")
 ```
 
 
