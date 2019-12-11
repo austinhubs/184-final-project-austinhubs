@@ -62,31 +62,30 @@ head(DaysUp)
 JustMonths <- Saleprices[-c(1,2,3)]
 JustMonthsState <- SalePricesState[-c(1,2,3)]
 
+applyFun <- function(set,num,fun){
+  return(apply(set,num,fun,na.rm=TRUE))
+}
+
+MonthlyCalcs <- data.frame("month"=colnames(JustMonths),"Min"=applyFun(JustMonths,2,min),"Max"=applyFun(JustMonths,2,max),"Mean"=applyFun(JustMonths,2,mean))
+MonthlyCalcs
 
 USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
 USExtensiveData <- USdata %>% left_join(MonthlyCalcs, by=c("month"="month"))
 USExtensiveData
 
-applyFun <- function(set,num,fun){
-  return(apply(set,num,fun,na.rm=TRUE))
-}
-MonthlyCalcs <- data.frame("month"=colnames(JustMonths),"Min"=applyFun(JustMonths,2,min),"Max"=applyFun(JustMonths,2,max),"Mean"=applyFun(JustMonths,2,mean))
-MonthlyCalcs
-
-
 MinMaxMeanPerState <- 
   SalePricesState %>%
-  mutate(MinimumPrice = apply(JustMonthsState,1,min,na.rm=TRUE)) %>%
-  mutate(MaximumPrice = apply(JustMonthsState,1,max,na.rm=TRUE)) %>%
-  mutate(MeanPrice = apply(JustMonthsState,1,mean,na.rm=TRUE)) %>%
+  mutate(MinimumPrice = applyFun(JustMonthsState,1,min)) %>%
+  mutate(MaximumPrice = applyFun(JustMonthsState,1,max)) %>%
+  mutate(MeanPrice = applyFun(JustMonthsState,1,mean)) %>%
   mutate(Difference = MaximumPrice-MinimumPrice)
 MinMaxMeanPerState
 
 TotalInfo <- 
   Saleprices %>%
-  mutate(MinimumPrice = apply(JustMonths,1,min,na.rm=TRUE)) %>%
-  mutate(MaximumPrice = apply(JustMonths,1,max,na.rm=TRUE)) %>%
-  mutate(MeanPrice = apply(JustMonths,1,mean,na.rm=TRUE))
+  mutate(MinimumPrice = applyFun(JustMonths,1,min)) %>%
+  mutate(MaximumPrice = applyFun(JustMonths,1,max)) %>%
+  mutate(MeanPrice = applyFun(JustMonths,1,mean))
 TotalInfo
 ```
 
