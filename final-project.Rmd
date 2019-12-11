@@ -60,11 +60,27 @@ head(DaysUp)
 ## Wrangling
 ```{r}
 JustMonths <- Saleprices[-c(1,2,3)]
-Mean <- apply(JustMonths,2,mean,na.rm=TRUE)
-Max <- apply(JustMonths,2,max,na.rm=TRUE)
-Min <- apply(JustMonths,2,min,na.rm=TRUE)
-MonthlyCalcs <- data.frame("month"=colnames(JustMonths),Min,Max,Mean)
+JustMonthsState <- SalePricesState[-c(1,2,3)]
+
+
+USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
+USExtensiveData <- USdata %>% left_join(MonthlyCalcs, by=c("month"="month"))
+USExtensiveData
+
+applyFun <- function(set,num,fun){
+  return(apply(set,num,fun,na.rm=TRUE))
+}
+MonthlyCalcs <- data.frame("month"=colnames(JustMonths),"Min"=applyFun(JustMonths,2,min),"Max"=applyFun(JustMonths,2,max),"Mean"=applyFun(JustMonths,2,mean))
 MonthlyCalcs
+
+
+MinMaxMeanPerState <- 
+  SalePricesState %>%
+  mutate(MinimumPrice = apply(JustMonthsState,1,min,na.rm=TRUE)) %>%
+  mutate(MaximumPrice = apply(JustMonthsState,1,max,na.rm=TRUE)) %>%
+  mutate(MeanPrice = apply(JustMonthsState,1,mean,na.rm=TRUE)) %>%
+  mutate(Difference = MaximumPrice-MinimumPrice)
+MinMaxMeanPerState
 
 TotalInfo <- 
   Saleprices %>%
@@ -72,19 +88,6 @@ TotalInfo <-
   mutate(MaximumPrice = apply(JustMonths,1,max,na.rm=TRUE)) %>%
   mutate(MeanPrice = apply(JustMonths,1,mean,na.rm=TRUE))
 TotalInfo
-
-USdata <- Saleprices %>% filter(RegionID==102001) %>% gather(month, price, -RegionID, -RegionName, -SizeRank)
-USExtensiveData <- USdata %>% left_join(MonthlyCalcs, by=c("month"="month"))
-USExtensiveData
-
-JustMonths2 <- SalePricesState[-c(1,2,3)]
-MinMaxMeanPerState <- 
-  SalePricesState %>%
-  mutate(MinimumPrice = apply(JustMonths2,1,min,na.rm=TRUE)) %>%
-  mutate(MaximumPrice = apply(JustMonths2,1,max,na.rm=TRUE)) %>%
-  mutate(MeanPrice = apply(JustMonths2,1,mean,na.rm=TRUE)) %>%
-  mutate(Difference = MaximumPrice-MinimumPrice)
-MinMaxMeanPerState
 ```
 
 ## Visualizations
