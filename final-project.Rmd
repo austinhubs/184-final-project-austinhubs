@@ -33,7 +33,6 @@ library(mosaic)
 Loading the data as a whole into a new variable in the RStudio environment. Here is the link of where the data was acquired from: https://www.zillow.com/research/data/
 ```{r include=FALSE}
 Saleprices <- read_csv("Sale_Prices_Msa.csv")
-DaysUp <- read_csv("DaysOnZillow_State.csv")
 SalePricesState <- read_csv("Sale_Prices_State.csv")
 ```
 ### House pricing dataset with 626 US Cities (2008-2019, monthly)
@@ -50,17 +49,10 @@ cat("Number of rows: ",nrow(SalePricesState),"\nNumber of columns: ",ncol(SalePr
 ```{r}
 head(SalePricesState)
 ```
-### Number of days a listing spent on Zillow per US State dataset (2010-2019, monthly)
-```{r echo=FALSE}
-cat("Number of rows: ",nrow(DaysUp),"\nNumber of columns: ",ncol(DaysUp),"\n")
-```
-```{r}
-head(DaysUp)
-```
 
 ## Wrangling
 
-I decided to create 4 different data sets, with 3 of them being used for graphics. These 3 include: US mean, max, and min prices for every month, the US mean, max, and min prices per state for every month, and the US mean, max, and min prices per top 626 cities for every month.
+I decided to create 4 different data sets, with 3 of them being used for graphics. These 3 include: US mean, max, and min prices for every month, the US mean, max, and min prices per state for every month, and the US mean, max, and min prices per top 626 cities for every month. There is also an additional dataset for the 4th graphic, but this required many different calculations and operations so that dataset is down with the graphic.
 ```{r}
 # Isolates just the months and their data by removing first 3 columns
 JustMonths <- Saleprices[-c(1,2,3)]
@@ -114,12 +106,12 @@ This graphic shows that there were more people moving out West after the housing
 USMap(data=MinMaxMeanPerState, key="RegionName", fill=Difference)
 ```
 
-And finally this graphic is one that helps to show the density of mean prices. Again in the red we have the mean values of all the US states and in blue we have the mean value of the top 626 cities in the US. The mean prices of the cities increase faster than the states but then also drop off much faster. Whereas the mean prices of the states takes longer to increase but also remains at that point longer. This graphic is interesting because it shows that there are more, higher prices for houses throughout all the states when compared to the cities. The houses in cities lost their value whereas the houses in more remote areas held their value or even increased.
+This graphic is one that helps to show the density of mean prices. Again in the red we have the mean values of all the US states and in blue we have the mean value of the top 626 cities in the US. The mean prices of the cities increase faster than the states but then also drop off much faster. Whereas the mean prices of the states takes longer to increase but also remains at that point longer. This graphic is interesting because it shows that there are more, higher prices for houses throughout all the states when compared to the cities. The houses in cities lost their value whereas the houses in more remote areas held their value or even increased.
 ```{r}
 ggplot( data = MinMaxMeanPerState, aes(x = MeanPrice,fill="All US States")) + geom_density(adjust = 0.38,alpha=.5)+labs(title = "")+geom_density(aes(x = MeanPrice,fill="Top 626 Cities"),MinMaxMeanPerCity,adjust = 0.38,alpha=.5)+guides(fill=guide_legend(title="Data"))
 ```
 
-
+Now the final graphic. I split the 50 States into the 10 most and 10 least populated, then set the average house price in March, 2008 as the baseline value. The time it took for the average price of a house to again reach that baseline value, after decreasing significantly, was calculated for each state. The reason that I wanted to divide up the states in most and least populated was to show how the housing crisis impacted different states. As you can clearly see from the graphic, houses in the least populated states spent a minimal amount of time on the market with 6/10 of those states having an average time of less than or equal a year. The value of houses in these states did not decrease in value that much, and bounced right back up after the recession. One reason for this is that people moved out to rural, less populated states and drove up the housing prices from demand. This supports my earlier idea that people were attempting to move away from the cities and suburbs and move towards more rural areas which allowed for these rural housing markets to recover more quickly. 
 ```{r}
 # Splits up the 50 states into the 10 most and 10 least populated states
 top <- SalePricesState %>% filter(SizeRank!=3) %>% head(10) %>% mutate(Size="Most populated states")
@@ -148,7 +140,8 @@ new <- data.frame(second=new) %>% mutate(second = lubridate::dym(second))
 FirstSecMonth <- TopBot %>% select(RegionName,Size) %>% mutate(first = lubridate::dym("2008-03"))
 FirstSecMonth <- cbind(FirstSecMonth,new)
 FirstSecMonth <- FirstSecMonth %>% mutate(Years = as.numeric(second-first)/365)
-FirstSecMonth %>% ggplot(aes(x=reorder(RegionName,Years),y=Years ,fill=Size))+geom_bar(stat='identity',position='dodge', width=.9) + theme(axis.text.x=element_text(angle=45,hjust=1))  +xlab("State Name")+ylab("Years on Market")+guides(fill=guide_legend(title="Population of state"))
+head(FirstSecMonth)
+FirstSecMonth %>% ggplot(aes(x=reorder(RegionName,Years),y=Years ,fill=Size))+geom_bar(stat='identity',position='dodge', width=.9) + theme(axis.text.x=element_text(angle=45,hjust=1))  +xlab("State Name")+ylab("Years Below Value")+guides(fill=guide_legend(title="Population of state"))
 ```
 
 
