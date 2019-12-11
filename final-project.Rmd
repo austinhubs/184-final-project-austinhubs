@@ -118,14 +118,37 @@ And finally this graphic is one that helps to show the density of mean prices. A
 ggplot( data = MinMaxMeanPerState, aes(x = MeanPrice,fill="All US States")) + geom_density(adjust = 0.38,alpha=.5)+labs(title = "")+geom_density(aes(x = MeanPrice,fill="Top 626 Cities"),MinMaxMeanPerCity,adjust = 0.38,alpha=.5)+guides(fill=guide_legend(title="Data"))
 ```
 
+for (i in 1:nrow(TopBot)) {
+  first <- TopBot[i,4]
+  for (j in 4:nccol(TopBot)) {
+    if (TopBot[i,j]>first) {
+      TopBot <- TopBot[i,149] + colnames(TopBot)[j]
+      break
+    }
+  }
+}
 
 ```{r}
 # find the time between the start and when it hits that price again
 
 top <- MinMaxMeanPerState %>% filter(SizeRank!=3) %>% head(10) %>% mutate(Size="Top")
 bot <- MinMaxMeanPerState %>% filter(SizeRank!=41, SizeRank!=42, SizeRank!=43) %>% tail(10) %>% mutate(Size="Bottom")
-FirstLastMonth <- rbind(top,bot) %>% mutate(first = lubridate::dym("2008-03")) %>% mutate(last = lubridate::dym("2015-03")) %>% mutate(DiffDays=last-first) %>% select(RegionName,Size,DiffDays)
-FirstLastMonth
+TopBot <- rbind(top,bot)
+TopBot
+TopBot$Second <- c("")
+TopBot
+FirstSecMonth <- TopBot %>% select(RegionName,Size,First="2008-03",Second)
+FirstSecMonth$Second <- c("")
+
+new <- FirstSecMonth[,3] + 5
+new
+
+
+
+
+#mutate(first = lubridate::dym(first)) %>% mutate(second = lubridate::dym(second)) %>% mutate(DiffDays=second-first) %>% select(RegionName,Size,DiffDays)
+
+
 
 ```
 
