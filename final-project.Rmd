@@ -119,7 +119,15 @@ ggplot( data = MinMaxMeanPerState, aes(x = MeanPrice,fill="All US States")) + ge
 ```
 
 
+```{r}
+# find the time between the start and when it hits that price again
 
+top <- MinMaxMeanPerState %>% filter(SizeRank!=3) %>% head(10) %>% mutate(Size="Top")
+bot <- MinMaxMeanPerState %>% filter(SizeRank!=41, SizeRank!=42, SizeRank!=43) %>% tail(10) %>% mutate(Size="Bottom")
+FirstLastMonth <- rbind(top,bot) %>% mutate(first = lubridate::dym("2008-03")) %>% mutate(last = lubridate::dym("2015-03")) %>% mutate(DiffDays=last-first) %>% select(RegionName,Size,DiffDays)
+FirstLastMonth
+
+```
 
 
 
