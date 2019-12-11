@@ -19,6 +19,7 @@ library(tidyverse)
 library(dplyr)
 library(lubridate)
 library(readr)
+library(mosaic)
 ```
 
 
@@ -118,38 +119,36 @@ And finally this graphic is one that helps to show the density of mean prices. A
 ggplot( data = MinMaxMeanPerState, aes(x = MeanPrice,fill="All US States")) + geom_density(adjust = 0.38,alpha=.5)+labs(title = "")+geom_density(aes(x = MeanPrice,fill="Top 626 Cities"),MinMaxMeanPerCity,adjust = 0.38,alpha=.5)+guides(fill=guide_legend(title="Data"))
 ```
 
-for (i in 1:nrow(TopBot)) {
-  first <- TopBot[i,4]
-  for (j in 4:nccol(TopBot)) {
-    if (TopBot[i,j]>first) {
-      TopBot <- TopBot[i,149] + colnames(TopBot)[j]
-      break
-    }
-  }
-}
 
 ```{r}
-# find the time between the start and when it hits that price again
-
-top <- MinMaxMeanPerState %>% filter(SizeRank!=3) %>% head(10) %>% mutate(Size="Top")
-bot <- MinMaxMeanPerState %>% filter(SizeRank!=41, SizeRank!=42, SizeRank!=43) %>% tail(10) %>% mutate(Size="Bottom")
+# Splits up the 50 states into the 10 most and 10 least populated states
+top <- SalePricesState %>% filter(SizeRank!=3) %>% head(10) %>% mutate(Size="Most populated states")
+bot <- SalePricesState %>% filter(SizeRank!=41, SizeRank!=42, SizeRank!=43) %>% tail(10) %>% mutate(Size="Least populated states")
 TopBot <- rbind(top,bot)
-TopBot
-TopBot$Second <- c("")
-TopBot
-FirstSecMonth <- TopBot %>% select(RegionName,Size,First="2008-03",Second)
-FirstSecMonth$Second <- c("")
 
-new <- FirstSecMonth[,3] + 5
-new
+# This function goes through each row and finds out when the average price of houses rose above the initial value in March of 2008
+new <- c("")
+for (i in 1:nrow(TopBot)) {
+  first <- TopBot[[4]]
+  for (j in 10:ncol(TopBot)) {
+    Second <- TopBot[[j]]
+    if(Second[i]>=first[i]){
+      new <- c(new,colnames(TopBot)[j])
+      break
+    } else if (j==142){
+      new <- c(new,colnames(TopBot)[j])
+      break
+    }
+  } 
+}
+new <- new[-1]
+new <- data.frame(second=new) %>% mutate(second = lubridate::dym(second))
 
-
-
-
-#mutate(first = lubridate::dym(first)) %>% mutate(second = lubridate::dym(second)) %>% mutate(DiffDays=second-first) %>% select(RegionName,Size,DiffDays)
-
-
-
+# This finds the amount of years it took for the price to recover back to its original amount
+FirstSecMonth <- TopBot %>% select(RegionName,Size) %>% mutate(first = lubridate::dym("2008-03"))
+FirstSecMonth <- cbind(FirstSecMonth,new)
+FirstSecMonth <- FirstSecMonth %>% mutate(Years = as.numeric(second-first)/365)
+FirstSecMonth %>% ggplot(aes(x=reorder(RegionName,Years),y=Years ,fill=Size))+geom_bar(stat='identity',position='dodge', width=.9) + theme(axis.text.x=element_text(angle=45,hjust=1))  +xlab("State Name")+ylab("Years on Market")+guides(fill=guide_legend(title="Population of state"))
 ```
 
 
